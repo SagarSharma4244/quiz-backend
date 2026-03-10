@@ -65,7 +65,7 @@ questionsRouter.post("/", async (req, res) => {
     topicId,
     question,
     options,
-    correctIndex,
+    correctIndex
   });
 
   res.status(201).json(created);
@@ -74,7 +74,7 @@ questionsRouter.post("/", async (req, res) => {
 questionsRouter.post("/:questionId/submit", async (req, res) => {
   const question = await QuizQuestionModel.findOne({
     id: req.params.questionId,
-  }).lean();
+  }).lean() as { correctIndex: number } | null;
   if (!question) {
     return res.status(404).json({ error: "Question not found" });
   }
