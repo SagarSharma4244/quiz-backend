@@ -1,42 +1,93 @@
 import mongoose, { Schema, InferSchemaType } from "mongoose";
 
-const SectorSchema = new Schema(
+const SubjectSchema = new Schema(
   {
     id: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
+    title: { type: String, required: true },
+    description: { type: String, default: "" },
+    publish_status: {
+      type: String,
+      enum: ["Draft", "private", "public"],
+      default: "Draft",
+    },
+    chapters_sequence: { type: [String], default: [] },
   },
   { timestamps: false }
 );
 
-const TopicSchema = new Schema(
+const ChapterSchema = new Schema(
   {
     id: { type: String, required: true, unique: true },
-    sectorId: { type: String, required: true, index: true },
-    name: { type: String, required: true },
+    subjectId: { type: String, required: true, index: true },
+    title: { type: String, required: true },
+    description: { type: String, default: "" },
+    publish_status: {
+      type: String,
+      enum: ["Draft", "private", "public"],
+      default: "Draft",
+    },
+    questions_sequence: { type: [String], default: [] },
+    level: {
+      type: String,
+      enum: ["Easy", "Medium", "Hard"],
+      default: "Easy",
+    },
   },
   { timestamps: false }
 );
 
-const QuizQuestionSchema = new Schema(
+const QuestionSchema = new Schema(
   {
     id: { type: String, required: true, unique: true },
-    topicId: { type: String, required: true, index: true },
-    question: { type: String, required: true },
+    chapterId: { type: String, required: true, index: true },
+    question_type: {
+      type: String,
+      enum: ["mcq", "multiple_choice", "drag", "correct_sequence", "match_the_following"],
+      default: "mcq",
+    },
+    title: { type: String, required: true },
     options: { type: [String], required: true },
-    correctIndex: { type: Number, required: true },
+    answer: { type: Schema.Types.Mixed, required: true },
+    subtitle: { type: String, default: "" },
+    reason: { type: String, default: "" },
+    publish_status: {
+      type: String,
+      enum: ["Draft", "private", "public", "testing"],
+      default: "Draft",
+    },
   },
   { timestamps: false }
 );
 
-export type SectorDoc = InferSchemaType<typeof SectorSchema>;
-export type TopicDoc = InferSchemaType<typeof TopicSchema>;
-export type QuizQuestionDoc = InferSchemaType<typeof QuizQuestionSchema>;
+export type SubjectDoc = InferSchemaType<typeof SubjectSchema>;
+export type ChapterDoc = InferSchemaType<typeof ChapterSchema>;
+export type QuestionDoc = InferSchemaType<typeof QuestionSchema>;
 
-export const SectorModel =
-  mongoose.models.Sector || mongoose.model("Sector", SectorSchema);
-export const TopicModel =
-  mongoose.models.Topic || mongoose.model("Topic", TopicSchema);
-export const QuizQuestionModel =
-  mongoose.models.QuizQuestion ||
-  mongoose.model("QuizQuestion", QuizQuestionSchema);
+export const SubjectModel =
+  mongoose.models.Subject || mongoose.model("Subject", SubjectSchema);
+export const ChapterModel =
+  mongoose.models.Chapter || mongoose.model("Chapter", ChapterSchema);
+export const QuestionModel =
+  mongoose.models.Question || mongoose.model("Question", QuestionSchema);
+
+function ignoreNamespaceExists(e: unknown) {
+  const maybe = e as { codeName?: string; message?: string };
+  if (maybe?.codeName === "NamespaceExists") {
+    return;
+  }
+  throw e;
+}
+
+export async function initDbTables() {
+  await Promise.all([
+    SubjectModel.createCollection().catch(ignoreNamespaceExists),
+    ChapterModel.createCollection().catch(ignoreNamespaceExists),
+    QuestionModel.createCollection().catch(ignoreNamespaceExists),
+  ]);
+  await Promise.all([
+    SubjectModel.syncIndexes(),
+    ChapterModel.syncIndexes(),
+    QuestionModel.syncIndexes(),
+  ]);
+}
 

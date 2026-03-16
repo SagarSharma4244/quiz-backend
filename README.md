@@ -35,18 +35,18 @@ MONGO_URL=mongodb://127.0.0.1:27017/quiz-app
 npm run seed
 ```
 
-This will insert sectors, topics, and quiz questions into MongoDB.
+This will insert subjects, chapters, and questions into MongoDB.
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/sectors` | List all sectors |
-| GET | `/api/sectors/:sectorId` | Get sector by ID |
-| GET | `/api/topics` | List all topics |
-| GET | `/api/topics?sectorId=:sectorId` | List topics by sector |
-| GET | `/api/topics/:topicId` | Get topic by ID |
+| GET | `/api/subjects` | List all subjects |
+| GET | `/api/subjects/:subjectId` | Get subject by ID |
+| GET | `/api/chapters` | List all chapters |
+| GET | `/api/chapters?subjectId=:subjectId` | List chapters by subject |
+| GET | `/api/chapters/:chapterId` | Get chapter by ID |
 | GET | `/api/questions` | List all questions |
-| GET | `/api/questions?topicId=:topicId` | List questions by topic |
+| GET | `/api/questions?chapterId=:chapterId` | List questions by chapter |
 | GET | `/api/questions/:questionId` | Get question by ID |
 | POST | `/api/questions/:questionId/submit` | Submit answer `{ "selectedIndex": 0 }` |

@@ -1,27 +1,27 @@
 import "dotenv/config";
 import { connectDB } from "./db";
 import {
-  sectors,
-  topics,
-  quizQuestions,
-  Sector,
-  Topic,
-  QuizQuestion,
+  subjects,
+  chapters,
+  questions,
+  Subject,
+  Chapter,
+  Question,
 } from "./data";
-import { SectorModel, TopicModel, QuizQuestionModel } from "./models";
+import { SubjectModel, ChapterModel, QuestionModel } from "./models";
 
 async function seed() {
   await connectDB();
 
-  await SectorModel.deleteMany({});
-  await TopicModel.deleteMany({});
-  await QuizQuestionModel.deleteMany({});
+  await SubjectModel.deleteMany({});
+  await ChapterModel.deleteMany({});
+  await QuestionModel.deleteMany({});
 
-  await SectorModel.insertMany(sectors as Sector[]);
-  await TopicModel.insertMany(topics as Topic[]);
-  await QuizQuestionModel.insertMany(quizQuestions as QuizQuestion[]);
+  await SubjectModel.insertMany(subjects as Subject[]);
+  await ChapterModel.insertMany(chapters as Chapter[]);
+  await QuestionModel.insertMany(questions as Question[]);
 
-  console.log("Seeded MongoDB with sectors, topics, and questions");
+  console.log("Seeded MongoDB with subjects, chapters, and questions");
 }
 
 seed()

@@ -1,10 +1,11 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { sectorsRouter } from "./routes/sectors";
-import { topicsRouter } from "./routes/topics";
+import { subjectsRouter } from "./routes/subjects";
+import { chaptersRouter } from "./routes/chapters";
 import { questionsRouter } from "./routes/questions";
 import { connectDB } from "./db";
+import { initDbTables } from "./models";
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -21,26 +22,27 @@ app.get("/", (_req, res) => {
   res.json({
     message: "Quiz API",
     endpoints: {
-      sectors: "GET /api/sectors",
-      sectorById: "GET /api/sectors/:sectorId",
-      topics: "GET /api/topics",
-      topicsBySector: "GET /api/topics?sectorId=:sectorId",
-      topicById: "GET /api/topics/:topicId",
+      subjects: "GET /api/subjects",
+      subjectById: "GET /api/subjects/:subjectId",
+      chapters: "GET /api/chapters",
+      chaptersBySubject: "GET /api/chapters?subjectId=:subjectId",
+      chapterById: "GET /api/chapters/:chapterId",
       questions: "GET /api/questions",
-      questionsByTopic: "GET /api/questions?topicId=:topicId",
+      questionsByChapter: "GET /api/questions?chapterId=:chapterId",
       questionById: "GET /api/questions/:questionId",
       submitAnswer: "POST /api/questions/:questionId/submit",
     },
   });
 });
 
-app.use("/api/sectors", sectorsRouter);
-app.use("/api/topics", topicsRouter);
+app.use("/api/subjects", subjectsRouter);
+app.use("/api/chapters", chaptersRouter);
 app.use("/api/questions", questionsRouter);
 
 async function start() {
   try {
     await connectDB();
+    await initDbTables();
     app.listen(PORT, () => {
       console.log(`Quiz API running at http://localhost:${PORT}`);
     });
