@@ -54,6 +54,45 @@ chaptersRouter.delete("/:chapterId", async (req, res) => {
   res.status(204).end();
 });
 
+chaptersRouter.post("/bulk", async (req, res) => {
+  const { chapters } = req.body ?? {};
+
+  if (!Array.isArray(chapters) || chapters.length === 0) {
+    return res.status(400).json({ error: "chapters must be a non-empty array" });
+  }
+
+  const subject = await SubjectModel.findOne({ id: chapters[0].subjectId }).lean();
+  if (!subject) {
+    return res.status(400).json({ error: "subjectId does not exist" });
+  }
+
+  const created = [];
+  const errors = [];
+
+  for (const ch of chapters) {
+    if (!ch.id || !ch.subjectId || !ch.title) {
+      errors.push({ chapter: ch.title ?? ch.id, error: "id, subjectId and title are required" });
+      continue;
+    }
+    try {
+      const doc = await ChapterModel.create({
+        id: ch.id,
+        subjectId: ch.subjectId,
+        title: ch.title,
+        description: ch.description ?? "",
+        publish_status: ch.publish_status || "Draft",
+        questions_sequence: Array.isArray(ch.questions_sequence) ? ch.questions_sequence : [],
+        level: ch.level || "Easy",
+      });
+      created.push(doc);
+    } catch (err: any) {
+      errors.push({ chapter: ch.title, error: err.message });
+    }
+  }
+
+  res.status(201).json({ created, errors });
+});
+
 chaptersRouter.post("/", async (req, res) => {
   const { id, subjectId, title, description, publish_status, questions_sequence, level } = req.body ?? {};
 
